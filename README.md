@@ -1,13 +1,3 @@
----
-title: AILL Research
-emoji: "🧠"
-colorFrom: blue
-colorTo: indigo
-sdk: static
-app_file: index.html
-pinned: false
----
-
 # AILL Research
 
 Artificial Intelligence with Lifelong Learning.
@@ -126,6 +116,68 @@ SenzaAdam exists to test a different persistent-memory path with bounded active 
 - lower active VRAM pressure than dense full-model training loops
 
 The research claim is narrow: a persistent memory benchmark can remain efficient when only a small active fraction of the stored brain participates at each step. This is not a claim of infinite memory, trillion-scale dense weights in 16GB VRAM, or production readiness.
+
+## Validation & Reproducibility
+
+AILL / SenzaAdam is an independent research prototype exploring persistent memory and local learning without Adam and without global backward passes. This section explains what the main benchmark metrics mean and provides raw log samples for transparency. Some code, datasets, and checkpoints are not fully released yet, so external reproducibility remains an open engineering target rather than a completed claim.
+
+### Metric Reference
+
+| Metric | What it means |
+| --- | --- |
+| recall_score | Estimates how often the system retrieves or reconstructs the expected answer or fact from persistent memory after learning. Higher is better, and a value near 1.0 means the sampled facts are being recalled correctly in the current benchmark window. |
+| anti_forgetting_score | Estimates whether previously learned facts remain available after new facts are added. A value of 1.0000 means no forgetting was detected in the sampled retention check for that benchmark window. |
+| active_cells_avg | Measures how many memory cells are active per operation on average. In the current run, active_cells_avg = 1.00 means the system is routing each fact through a very small active subset, keeping active compute extremely low. |
+| no_adam=True | Means the SenzaAdam memory update does not rely on the Adam optimizer for the persistent memory mechanism. |
+| no_global_backward=True | Means the benchmarked memory mechanism does not use a global backpropagation pass to store each new fact. Updates are local to the active memory path. |
+
+### Benchmark Protocol
+
+For each fact:
+
+- the system receives a real fact / concept pair
+- it routes the fact to an active memory cell
+- it updates the persistent brain file
+- later, sampled facts are queried again
+- recall_score checks whether the fact is retrieved correctly
+- anti_forgetting_score checks whether older facts remain available after newer updates
+
+### Current Run Status
+
+- Current live run: 8.13M / 10M real facts processed
+- Hardware: RTX 4060 Ti consumer hardware
+- active_cells_avg = 1.00
+- anti_forgetting_score = 1.0000
+- brain file size around 1.36GB
+- active_vram_estimate_mb = 0.002213
+
+### Raw Log Sample
+
+```text
+log step=8774989 learned_facts=8774989 total_cells=399172 created_cells=399172 reused_cells=8375817 active_cells_avg=1.00 recall_score=0.9844 anti_forgetting_score=1.0000 brain_file_size_mb=1364.3887 active_vram_estimate_mb=0.002213 no_adam=True no_global_backward=True
+  throughput=31.4 facts/sec  fact_idx=8,100,000/10,000,000  elapsed=279854s
+
+log step=8785823 learned_facts=8785823 total_cells=399394 created_cells=399394 reused_cells=8386429 active_cells_avg=1.00 recall_score=0.9961 anti_forgetting_score=1.0000 brain_file_size_mb=1365.1475 active_vram_estimate_mb=0.002213 no_adam=True no_global_backward=True
+  throughput=31.3 facts/sec  fact_idx=8,110,000/10,000,000  elapsed=280469s
+
+log step=8796656 learned_facts=8796656 total_cells=399551 created_cells=399551 reused_cells=8397105 active_cells_avg=1.00 recall_score=0.9728 anti_forgetting_score=1.0000 brain_file_size_mb=1365.6841 active_vram_estimate_mb=0.002213 no_adam=True no_global_backward=True
+  throughput=31.3 facts/sec  fact_idx=8,120,000/10,000,000  elapsed=281048s
+
+log step=8807489 learned_facts=8807489 total_cells=399777 created_cells=399777 reused_cells=8407712 active_cells_avg=1.00 recall_score=0.9689 anti_forgetting_score=1.0000 brain_file_size_mb=1366.4565 active_vram_estimate_mb=0.002213 no_adam=True no_global_backward=True
+  throughput=31.3 facts/sec  fact_idx=8,130,000/10,000,000  elapsed=281620s
+```
+
+### Limitations
+
+> This is not AGI.
+>
+> This is not a production chatbot.
+>
+> The benchmark validates a specific persistent-memory mechanism, not general intelligence.
+>
+> More external reproducibility work is needed.
+>
+> Code, datasets, and checkpoints may be released gradually when cleaned and documented.
 
 ## Correct External Claim
 
