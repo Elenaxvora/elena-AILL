@@ -1,3 +1,4 @@
 *.png filter=lfs diff=lfs merge=lfs -text
 assets/benchmarks/*.png filter=lfs diff=lfs merge=lfs -text
 *.webp filter=lfs diff=lfs merge=lfs -text
+assets/benchmarks/*.webp filter=lfs diff=lfs merge=lfs -text
