@@ -1,3 +1,13 @@
+---
+title: AILL Research
+emoji: "🧠"
+colorFrom: blue
+colorTo: indigo
+sdk: static
+app_file: index.html
+pinned: false
+---
+
 # AILL Research
 
 Artificial Intelligence with Lifelong Learning.
